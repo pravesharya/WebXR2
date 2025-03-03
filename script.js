@@ -59,8 +59,8 @@ function setupScene() {
     allShapes.add(mesh);
   }
 
-  // scene.add(allShapes);
-  room.add(allShapes);
+  scene.add(allShapes);
+  // room.add(allShapes);
 
   setupControls();
   setupXR();
@@ -92,8 +92,8 @@ function setupControls() {
 
 function animateScene() {
   renderer.setAnimationLoop(() => {
-    // allShapes.rotateY(-0.01);
-    room.rotateY(-0.01);
+    allShapes.rotateY(-0.01);
+    // room.rotateY(-0.01);
     renderer.render(scene, camera);
     controls.update();
   });
