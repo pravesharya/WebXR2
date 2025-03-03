@@ -16,8 +16,6 @@ let shapes = [
 ];
 
 function setupScene() {
-  // console.log(random(0,10));
-
   renderer = new THREE.WebGLRenderer({ antialias: true });
   document.body.appendChild(renderer.domElement);
   renderer.setSize(width, height);
@@ -31,11 +29,8 @@ function setupScene() {
   scene.add(lightA);
 
   lightD = new THREE.DirectionalLight(0xffffff, 10);
-  // lightD.position.set(10, 1, 1).normalize();
   lightD.position.set(15, 0, -5);
   camera.add(lightD);
-  // scene.add(lightD);
-  // scene.add(new THREE.CameraHelper(lightD.shadow.camera));
 
   // room = new THREE.LineSegments(
   //   new BoxLineGeometry(6, 6, 6, 3, 3, 3),
@@ -64,6 +59,7 @@ function setupScene() {
 
     allShapes.add(mesh);
   }
+
   scene.add(allShapes);
   // room.add(allShapes);
 
@@ -73,7 +69,7 @@ function setupScene() {
 }
 setupScene();
 
-function setupXR(params) {
+function setupXR() {
   renderer.xr.enabled = true;
   document.body.appendChild(VRButton.createButton(renderer));
   XR = renderer.xr;
@@ -96,7 +92,6 @@ function setupControls() {
 }
 
 function animateScene() {
-  // requestAnimationFrame(animateScene);
   renderer.setAnimationLoop(() => {
     allShapes.rotateY(-0.01);
     // room.rotateY(-0.01);
