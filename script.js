@@ -32,15 +32,14 @@ function setupScene() {
   lightD.position.set(15, 0, -5);
   camera.add(lightD);
 
-  // room = new THREE.LineSegments(
-  //   new BoxLineGeometry(6, 6, 6, 3, 3, 3),
-  //   new THREE.LineBasicMaterial({ color: 0x808080 })
-  // );
-  // scene.add(room);
+  room = new THREE.LineSegments(
+    new BoxLineGeometry(6, 6, 6, 3, 3, 3),
+    new THREE.LineBasicMaterial({ color: 0x808080 })
+  );
+  scene.add(room);
 
   for (let i = 0; i < 75; i++) {
     let material = new THREE.MeshLambertMaterial({
-      // let material = new THREE.MeshStandardMaterial({
       color: Math.random() * 0xffffff,
     });
     let shape = shapes[Math.floor(Math.random() * shapes.length)];
@@ -60,8 +59,8 @@ function setupScene() {
     allShapes.add(mesh);
   }
 
-  scene.add(allShapes);
-  // room.add(allShapes);
+  // scene.add(allShapes);
+  room.add(allShapes);
 
   setupControls();
   setupXR();
@@ -93,8 +92,8 @@ function setupControls() {
 
 function animateScene() {
   renderer.setAnimationLoop(() => {
-    allShapes.rotateY(-0.01);
-    // room.rotateY(-0.01);
+    // allShapes.rotateY(-0.01);
+    room.rotateY(-0.01);
     renderer.render(scene, camera);
     controls.update();
   });
