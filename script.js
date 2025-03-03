@@ -1,20 +1,23 @@
 import * as THREE from "three";
 import { OrbitControls } from "OrbitControls";
 import { VRButton } from "VRButton";
+import { BoxLineGeometry } from "BoxLineGeometry";
 
 let width = window.innerWidth;
 let height = window.innerHeight;
 
 let renderer, scene, camera, lightA, lightD, controls;
 const allShapes = new THREE.Group();
-let XR;
+let XR, room;
 
 let shapes = [
-  new THREE.BoxGeometry(0.25, 0.25, 0.25),
-  new THREE.SphereGeometry(0.25, 32, 32),
+  new THREE.BoxGeometry(0.05, 0.05, 0.05),
+  new THREE.SphereGeometry(0.05, 32, 32),
 ];
 
 function setupScene() {
+  // console.log(random(0,10));
+
   renderer = new THREE.WebGLRenderer({ antialias: true });
   document.body.appendChild(renderer.domElement);
   renderer.setSize(width, height);
@@ -34,18 +37,24 @@ function setupScene() {
   // scene.add(lightD);
   // scene.add(new THREE.CameraHelper(lightD.shadow.camera));
 
+  // room = new THREE.LineSegments(
+  //   new BoxLineGeometry(6, 6, 6, 3, 3, 3),
+  //   new THREE.LineBasicMaterial({ color: 0x808080 })
+  // );
+  // scene.add(room);
+
   for (let i = 0; i < 75; i++) {
-    let material = new THREE.MeshStandardMaterial({
-      // let material = new THREE.MeshBasicMaterial({
+    let material = new THREE.MeshLambertMaterial({
+      // let material = new THREE.MeshStandardMaterial({
       color: Math.random() * 0xffffff,
     });
     let shape = shapes[Math.floor(Math.random() * shapes.length)];
     let mesh = new THREE.Mesh(shape, material);
 
     mesh.position.set(
-      (Math.random() - 0.5) * 10,
-      (Math.random() - 0.5) * 10,
-      (Math.random() - 0.5) * 10
+      (Math.random() - 0.5) * 5,
+      (Math.random() - 0.5) * 5,
+      (Math.random() - 0.5) * 5
     );
     mesh.rotation.set(
       Math.random() * 2 * Math.PI,
@@ -56,17 +65,26 @@ function setupScene() {
     allShapes.add(mesh);
   }
   scene.add(allShapes);
+  // room.add(allShapes);
 
   setupControls();
-  setupSession();
+  setupXR();
   animateScene();
 }
 setupScene();
 
-function setupSession(params) {
+function setupXR(params) {
   renderer.xr.enabled = true;
   document.body.appendChild(VRButton.createButton(renderer));
   XR = renderer.xr;
+
+  XR.addEventListener("sessionstart", () => {
+    controls.enabled = false; // Disable OrbitControls in VR
+  });
+
+  XR.addEventListener("sessionend", () => {
+    controls.enabled = true; // Enable OrbitControls when exiting VR
+  });
 }
 
 function setupControls() {
@@ -78,12 +96,13 @@ function setupControls() {
 }
 
 function animateScene() {
-  requestAnimationFrame(animateScene);
-  // allShapes.rotateX(-0.01);
-  allShapes.rotateY(-0.01);
-  // allShapes.rotateZ(0.01);
-  renderer.render(scene, camera);
-  controls.update();
+  // requestAnimationFrame(animateScene);
+  renderer.setAnimationLoop(() => {
+    allShapes.rotateY(-0.01);
+    // room.rotateY(-0.01);
+    renderer.render(scene, camera);
+    controls.update();
+  });
 }
 
 window.addEventListener("resize", () => {
