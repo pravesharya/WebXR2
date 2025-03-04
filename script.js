@@ -2,13 +2,16 @@ import * as THREE from "three";
 import { OrbitControls } from "OrbitControls";
 import { VRButton } from "VRButton";
 import { BoxLineGeometry } from "BoxLineGeometry";
+import { XRControllerModelFactory } from "XRControllerModelFactory";
+
+console.log(XRControllerModelFactory);
 
 let width = window.innerWidth;
 let height = window.innerHeight;
 
 let renderer, scene, camera, lightA, lightD, controls;
 const allShapes = new THREE.Group();
-let XR, room;
+let XR, room, C1, C2, controllers, raycaster, workingMatrix, workingVector;
 
 let shapes = [
   new THREE.BoxGeometry(0.05, 0.05, 0.05),
@@ -62,7 +65,7 @@ function setupScene() {
   scene.add(allShapes);
   // room.add(allShapes);
 
-  setupControls();
+  setupOrbitControls();
   setupXR();
   animateScene();
 }
@@ -80,9 +83,56 @@ function setupXR() {
   XR.addEventListener("sessionend", () => {
     controls.enabled = true; // Enable OrbitControls when exiting VR
   });
+
+  raycaster = new THREE.Raycaster();
+  workingMatrix = new THREE.Matrix4();
+  workingVector = new THREE.Vector3();
+  controllers = controllerSetup();
 }
 
-function setupControls() {
+function controllerSetup() {
+  // C1 = XR.getController(0);
+  // C2 = XR.getController(1);
+
+  // C1.addEventListener('selectstart', controllerHandle);
+  // C1.addEventListener('selectend', controllerHandle);
+  // C2.addEventListener('selectstart', controllerHandle);
+  // C2.addEventListener('selectend', controllerHandle);
+
+  // scene.add(C1);
+  // scene.add(C2);
+
+  // console.log(C1);
+  // console.log(C2);
+
+  const controllerModelFactory = new XRControllerModelFactory();
+  const geometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, -1),
+  ]);
+  const line = new THREE.Line(geometry);
+  line.name = "line";
+  line.scale.z = 0;
+  const controllers = [];
+  for (let i = 0; i <= 1; i++) {
+    const controller = XR.getController(i);
+    controller.add(line.clone());
+    controller.userData.selectPressed = false;
+    scene.add(controller);
+    controllers.push(controller);
+    const grip = XR.getControllerGrip(i);
+    grip.add(controllerModelFactory.createControllerModel(grip));
+    scene.add(grip);
+  }
+  console.log("Controller Built");
+  return controllers;
+}
+
+function controllerHandle() {
+  console.log("Controller used");
+}
+
+function setupOrbitControls() {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.25;
