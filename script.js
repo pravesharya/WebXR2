@@ -87,24 +87,12 @@ function setupXR() {
   raycaster = new THREE.Raycaster();
   workingMatrix = new THREE.Matrix4();
   workingVector = new THREE.Vector3();
-  controllers = controllerSetup();
+
+  // controllers = controllerSetup_Default();
+  controllers = controllerSetup_Custom();
 }
 
-function controllerSetup() {
-  // C1 = XR.getController(0);
-  // C2 = XR.getController(1);
-
-  // C1.addEventListener('selectstart', controllerHandle);
-  // C1.addEventListener('selectend', controllerHandle);
-  // C2.addEventListener('selectstart', controllerHandle);
-  // C2.addEventListener('selectend', controllerHandle);
-
-  // scene.add(C1);
-  // scene.add(C2);
-
-  // console.log(C1);
-  // console.log(C2);
-
+function controllerSetup_Default() {
   const controllerModelFactory = new XRControllerModelFactory();
   const geometry = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(0, 0, 0),
@@ -124,6 +112,43 @@ function controllerSetup() {
     grip.add(controllerModelFactory.createControllerModel(grip));
     scene.add(grip);
   }
+  console.log("Controller Built");
+  return controllers;
+}
+
+function controllerSetup_Custom() {
+  C1 = XR.getController(0);
+  C2 = XR.getController(1);
+
+  C1.addEventListener('selectstart', controllerHandle);
+  C1.addEventListener('selectend', controllerHandle);
+  C2.addEventListener('selectstart', controllerHandle);
+  C2.addEventListener('selectend', controllerHandle);
+
+  scene.add(C1);
+  scene.add(C2);
+  console.log(C1);
+  console.log(C2);
+
+  const geometry = new THREE.ConeGeometry(0.05, 0.2, 32);
+  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const cone = new THREE.Mesh(geometry, material);
+  cone.rotation.x = Math.PI / 2;
+  C1.add(cone.clone());
+  C2.add(cone.clone());
+
+  const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, -1)
+  ]);
+  const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+  const line = new THREE.Line(lineGeometry, lineMaterial);
+  line.name = "line";
+  line.scale.z = 5; // Length of the line
+
+  C1.add(line.clone());
+  C2.add(line.clone());
+
   console.log("Controller Built");
   return controllers;
 }
