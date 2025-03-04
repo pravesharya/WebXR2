@@ -90,6 +90,7 @@ function setupXR() {
 
   // controllers = controllerSetup_Default();
   controllers = controllerSetup_Custom();
+  // controllerHandle();
 }
 
 function controllerSetup_Default() {
@@ -144,7 +145,7 @@ function controllerSetup_Custom() {
   const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
   const line = new THREE.Line(lineGeometry, lineMaterial);
   line.name = "line";
-  line.scale.z = 5; // Length of the line
+  line.scale.z = 10; // Length of the line
 
   C1.add(line.clone());
   C2.add(line.clone());
@@ -155,7 +156,22 @@ function controllerSetup_Custom() {
 
 function controllerHandle() {
   console.log("Controller used");
+  const intersected = raycaster.intersectObjects(allShapes.children);
+  if (intersected.length > 0) {
+    const controller = this;
+    const line = controller.getObjectByName("line");
+    if (line) {
+      line.material.color.set(0x00ff00); // Change color to green on interaction
+    }
+  } else {
+    const controller = this;
+    const line = controller.getObjectByName("line");
+    if (line) {
+      line.material.color.set(0xffffff); // Reset color to white when not interacting
+    }
+  }
 }
+controllerHandle();
 
 function setupOrbitControls() {
   controls = new OrbitControls(camera, renderer.domElement);
@@ -167,8 +183,9 @@ function setupOrbitControls() {
 
 function animateScene() {
   renderer.setAnimationLoop(() => {
-    allShapes.rotateY(-0.01);
+    allShapes.rotateY(-0.005);
     // room.rotateY(-0.01);
+    // controllerHandle();
     renderer.render(scene, camera);
     controls.update();
   });
